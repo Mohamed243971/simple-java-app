@@ -5,7 +5,7 @@ pipeline {
         stage('Build & Test') {
             steps {
                 echo 'Building and Testing Java Application inside Docker Maven Container...'
-                sh "docker run --rm -v ${WORKSPACE}:/app -w /app maven:3.6.3-jdk-11-slim mvn clean package"
+                sh "docker run --rm -v ${WORKSPACE}:/app -w /app maven:3.6.3-jdk-8-slim mvn clean package"
             }
         }
 
