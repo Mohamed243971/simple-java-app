@@ -2,29 +2,26 @@ pipeline {
     agent any 
 
     stages {
-        stage('build') {
+        // 1. مرحلة الـ Build & Test (هنعملهم جوه حاوية مافن معزولة تماماً)
+        stage('Build & Test') {
             steps {
-                echo 'Building Java Application using Maven...'
-                sh 'mvn clean package -DskipTests' 
+                echo 'Building and Testing Java Application inside Docker Maven Container...'
+                // الأمر ده بيقوم حاوية مافن، يعطيه الكود بتاعك، يشغل التيست والـ package، ويمسح الحاوية فوراً
+                sh 'docker run --rm -v "$(pwd)":/app -w /app maven:3.6.3-jdk-11-slim mvn clean package'
             }
         }
 
-        stage('Test') {
-            steps {
-                echo 'Running Unit Tests...'
-                sh 'mvn test'
-            }
-        }
-
+        // 2. مرحلة بناء صورة الدكر النهائية للتطبيق
         stage('Build Docker Image') {
             steps {
-                echo 'Building Docker Image...'
+                echo 'Building Final Docker Image...'
                 script {
                     dockerImage = docker.build("java-app")
                 }
             }
         }
 
+        // 3. مرحلة الـ Push على Docker Hub
         stage('push') {
             steps {
                 script {
